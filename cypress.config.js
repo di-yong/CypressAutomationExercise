@@ -16,10 +16,10 @@ module.exports = defineConfig({
 	env: {
 		baseUrl: 'https://automationexercise.com/'
 	},
-	retries: {
-		runMode: 1,
-		openMode: 1
-	},
+//	retries: {
+//		runMode: 1,
+//		openMode: 1
+//	},
   e2e: {
     setupNodeEvents,
     specPattern: 'cypress/integration/examples/*.feature',
