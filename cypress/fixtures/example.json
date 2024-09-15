@@ -1,6 +1,8 @@
 {
   "userData": {
     "login_password": "123456789",
+    "signUp_firstName": "first",
+    "signUp_lastName": "last",
     "signUp_address": "100 street street",
     "signUp_state": "NSW",
     "signUp_city": "Sydney",
