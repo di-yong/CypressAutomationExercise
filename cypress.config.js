@@ -15,13 +15,24 @@ module.exports = defineConfig({
 	env: {
 		baseUrl: 'https://automationexercise.com/'
 	},
-//	retries: {
-//		runMode: 1,
-//		openMode: 1
-//	},
+	screenshotsFolder: 'cypress/reports/html/screenshots',
+	retries: {
+		runMode: 1,
+		openMode: 1
+	},
   e2e: {
     setupNodeEvents,
     specPattern: 'cypress/integration/examples/*.feature',
     stepDefinitions: "cypress/integration/examples/purchaseOrder/*.js"
   },
+  reporterOptions: {
+    reportDir: 'cypress/reports/html',
+    overwrite: false,
+    html: true,
+    json: true,
+    charts: true,
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    screenshotsFolder: 'screenshots'
+   }
 });

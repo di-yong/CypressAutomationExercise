@@ -20,14 +20,6 @@ const paymentPage = new PaymentPage();
 const paymentCompletePage = new PaymentCompletePage();
 const deleteAccountPage = new DeleteAccountPage();
 
-//const fields = [
-//	{name: 'name_on_card', value: 'DiTest', message: 'Please fill out this field.'},
-//	{name: 'card_number', value: '123456789', message: 'Please fill out this field.'},
-//	{name: 'cvc', value: '01', message: 'Please fill out this field.'},
-//	{name: 'expiry_month', value: '02', message: 'Please fill out this field.'},
-//	{name: 'expiry_year', value: '2042', message: 'Please fill out this field.'}
-//];
-
 let userData;
 let paymentFields;
 let newName;
@@ -64,7 +56,9 @@ Then('User enter account and address information to create account', () => {
 
 /*------------------Account created page------------------*/
 When('User validates the account created message', () => {
-	accountCreatedPage.getAccountCreatedSuccessText().should('have.text', 'Account Created!');
+	accountCreatedPage.getAccountCreatedSuccessText()
+		.should('be.visible')
+		.and('have.text', 'Account Created!');
 })
 
 Then('User clicks the Continue button', () => {
@@ -77,34 +71,27 @@ Then('User clicks the Logout button to Login Page', () => {
 })
 
 /*------------------Login page------------------*/
-When('User inputs incorrect email and password', () => {
-	loginPage.getLoginEmailTextBox().type(newEmail + 'i');
-  loginPage.getLoginPasswordTextBox().type(userData.login_password + 'i');
-  loginPage.getLoginSubmitBtn().click();
+When('User inputs incorrect email, password and submit', () => {
+	cy.login(loginPage, newEmail + 'i', userData.login_password + 'i');
 })
 
 Then('User validates the error message', () => {
-	loginPage.getLoginErrorMessageText().should('have.text', 'Your email or password is incorrect!');
+	loginPage.getLoginErrorMessageText()
+		.should('be.visible')
+		.and('have.text', 'Your email or password is incorrect!');
 })
 
-When('User inputs correct email and password', () => {
-	loginPage.getLoginEmailTextBox().clear().type(newEmail);
-  loginPage.getLoginPasswordTextBox().clear().type(userData.login_password);
+When('User inputs correct email, password and submit', () => {
+	cy.login(loginPage, newEmail, userData.login_password);
 })
 
-Then('User click the Login button to Main Page', () => {
-	loginPage.getLoginSubmitBtn().click();
+Then('User progress to the main page', () => {
+	cy.url().should('eq', Cypress.env('baseUrl'));
 })
 
 /*------------------Main page------------------*/
 When('User adds all Tshirts to the cart', () => {
-	mainPage.getProductInfo().each(($el, index, $list) => {
-    const titleItem = $el.find("p").text();
-    if(titleItem.includes('Tshirt')) {
-      $el.find("i").click();
-    }
-  });
-  mainPage.getCartBtn().click();
+  cy.addItemsToCartByKeyword(mainPage, 'Tshirt');
 })
 
 /*------------------View Cart page------------------*/
@@ -114,11 +101,7 @@ Then('User go to cart page to checkout', () => {
 
 /*------------------Checkout page------------------*/
 Then('User validates the address information', () => {
-	checkOutPage.getDeliveryAddressText().invoke('text').then((text1) => {
-  checkOutPage.getBillingAddressText().invoke('text').then((text2) => {
-    expect(text1.trim()).to.eq(text2.trim());
-    });
-  });
+	 cy.validateAddress(checkOutPage, checkOutPage.getDeliveryAddressText(), checkOutPage.getBillingAddressText());
 })
 
 Then('User clicks the Place Order button to Payment page', () => {
@@ -128,27 +111,20 @@ Then('User clicks the Place Order button to Payment page', () => {
 /*------------------Payment page------------------*/
 When('User inputs nothing and validates the warning message', () => {
 	paymentPage.getPayAndConfirmOrderBtn().contains('Pay and Confirm Order').click();
-
-    // Proceed to Checkout in Incorrect Scenario
-    paymentFields.forEach(field => {
-      cy.get(`input[name='${field.name}']`).then(input => {
-        const isValid = input[0].checkValidity();
-        const message = isValid ? '' : field.message;
-        expect(input[0].validationMessage).to.eq(message);
-      });
-    });
+  // Proceed to Checkout in Incorrect Scenario
+  cy.handlePaymentFields(paymentFields, 'validate');
 })
 
 Then('User inputs correct card information and clicks confirm order button', () => {
-	paymentFields.forEach(field => {
-    cy.get(`input[name='${field.name}']`).type(field.value);
-  });
+	cy.handlePaymentFields(paymentFields, 'fill');
   paymentPage.getPayAndConfirmOrderBtn().contains('Pay and Confirm Order').click();
 })
 
 /*------------------Payment Complete page------------------*/
 When('User validates the order confirmed message', () => {
-	paymentCompletePage.getOrderConfirmedText().should('have.text', 'Congratulations! Your order has been confirmed!');
+	paymentCompletePage.getOrderConfirmedText()
+		.should('be.visible')
+		.and('have.text', 'Congratulations! Your order has been confirmed!');
 })
 
 Then('User clicks the download invoice button', () => {
@@ -156,17 +132,11 @@ Then('User clicks the download invoice button', () => {
 })
 
 Then('User verify the invoice document', () => {
-	const fileName = 'invoice.txt';
-  const filePath = `cypress/downloads/${fileName}`;
-  cy.readFile(filePath).should('exist');
-  cy.readFile(filePath).should((fileContent) => {
-  expect(fileName.endsWith('.txt')).to.be.true;
-	})
+	cy.verifyDownloadedFile('invoice.txt');
 })
 /*------------------Main page------------------*/
 Then('User Scroll down to the bottom of the page', () => {
 	 cy.scrollTo('bottom', { duration: 4000 });
-   cy.wait(1000);
 })
 
 When('User Scroll up to the top of the page', () => {
@@ -174,7 +144,8 @@ When('User Scroll up to the top of the page', () => {
 })
 
 Then('User validates the headers becomes visible again', () => {
-	mainPage.getAutomationExerciseImg().should('be.visible');
+	mainPage.getAutomationExerciseImg()
+		.should('be.visible');
 })
 
 When('User clicks the Delete Account button', () => {
@@ -183,7 +154,9 @@ When('User clicks the Delete Account button', () => {
 
 /*------------------Delete Account page------------------*/
 Then('User validates the account bas been deleted successful', () => {
-	deleteAccountPage.getAccountDeletedText().should('have.text', 'Account Deleted!');
+	deleteAccountPage.getAccountDeletedText()
+		.should('be.visible')
+		.and('have.text', 'Account Deleted!');
 })
 
 Then('User clicks the Continue button to main page', () => {

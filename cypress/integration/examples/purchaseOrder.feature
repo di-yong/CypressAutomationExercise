@@ -7,10 +7,10 @@ Feature: End to End testing - automationexercise.com
     When User validates the account created message
     Then User clicks the Continue button
     Then User clicks the Logout button to Login Page
-    When User inputs incorrect email and password
+    When User inputs incorrect email, password and submit
     Then User validates the error message
-    When User inputs correct email and password
-    Then User click the Login button to Main Page
+    When User inputs correct email, password and submit
+    Then User progress to the main page
     When User adds all Tshirts to the cart
     Then User go to cart page to checkout
     Then User validates the address information

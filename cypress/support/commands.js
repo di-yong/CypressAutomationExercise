@@ -35,8 +35,8 @@ Cypress.Commands.add('signupWithRandomEmail', (userData, loginPage, maxRetries =
 	 } else {
 	   return cy.wrap({ newName, newEmail });
 	   }
-});
-};
+		});
+	};
   return attemptSignup();
 });
 
@@ -44,4 +44,54 @@ Cypress.Commands.add('login', (loginPage, email, password) => {
   loginPage.getLoginEmailTextBox().clear().type(email);
   loginPage.getLoginPasswordTextBox().clear().type(password);
   loginPage.getLoginSubmitBtn().click();
+});
+
+Cypress.Commands.add('validateAddress', (checkOutPage, deliveryAddressSelector, billingAddressSelector) => {
+  checkOutPage.getDeliveryAddressText().invoke('text').then((deliveryAddress) => {
+  checkOutPage.getBillingAddressText().invoke('text').then((billingAddress) => {
+    expect(deliveryAddress.trim()).to.eq(billingAddress.trim());
+  });
+ });
+});
+
+Cypress.Commands.add('addItemsToCartByKeyword', (mainPage, keyword) => {
+  let foundItems = false;
+
+  mainPage.getProductInfo().each(($el) => {
+    const titleItem = $el.find('p').text();
+    if (titleItem.includes(keyword)) {
+      foundItems = true;
+      $el.find('i').click();
+    }
+  }).then(() => {
+    if (!foundItems) {
+      cy.log(`No items found with keyword: ${keyword}`);
+      throw new Error(`No items found with keyword: ${keyword}`);
+    }
+    mainPage.getCartBtn().click();
+  });
+});
+
+Cypress.Commands.add('handlePaymentFields', (paymentFields, action) => {
+  paymentFields.forEach(field => {
+    const inputSelector = `input[name='${field.name}']`;
+
+    if (action === 'validate') {
+      cy.get(inputSelector).then(input => {
+        const isValid = input[0].checkValidity();
+        const message = isValid ? '' : field.message;
+        expect(input[0].validationMessage).to.eq(message);
+      });
+    } else if (action === 'fill') {
+      cy.get(inputSelector).type(field.value);
+    }
+  });
+});
+
+Cypress.Commands.add('verifyDownloadedFile', (fileName) => {
+  const filePath = `cypress/downloads/${fileName}`;
+  cy.readFile(filePath).should('exist');
+  cy.readFile(filePath).should((fileContent) => {
+    expect(fileName.endsWith('.txt')).to.be.true;
+  });
 });
