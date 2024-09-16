@@ -1,4 +1,4 @@
-Cypress.Commands.add('fillSignupForm', (userData, signUpPage, newName) => {
+Cypress.Commands.add('fillSignupForm', (userData, signUpPage) => {
   signUpPage.getSignUpPasswordTextBox().type(userData.login_password);
   signUpPage.getSignUpFirstNameTextBox().type(userData.signUp_firstName);
   signUpPage.getSignUpLastNameTextBox().type(userData.signUp_lastName);
@@ -19,22 +19,29 @@ Cypress.Commands.add('signupWithRandomEmail', (userData, loginPage, maxRetries =
     newName = Cypress._.random(1, 10000);
     newEmail = `${newName}@gmail.com`;
 
-    loginPage.getSignUpNameTextBox().type(newName);
-    loginPage.getSignUpEmailTextBox().type(newEmail);
+    loginPage.getSignUpNameTextBox().clear().type(newName);
+    loginPage.getSignUpEmailTextBox().clear().type(newEmail);
     loginPage.getSignUpBtn().click();
 
-    cy.get('body').then((body) => {
-      if (body.find("[style='color: red;']").length > 0 && body.find("[style='color: red;']").text().includes('Email Address already exist!')) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          cy.log(`Retrying signup... Attempt #${retryCount}`);
-          attemptSignup();
-        } else {
-          throw new Error('Max retries reached. Unable to sign up after ${maxRetries} attempts.');
-        };
-      };
-      return { newName, newEmail };
-    });
-  };
+ cy.get('body').then((body) => {
+	 if (body.find("[style='color: red;']").length > 0 && body.find("[style='color: red;']").text().includes('Email Address already exist!')) {
+	   if (retryCount < maxRetries) {
+	     retryCount++;
+	     cy.log(`Retrying signup... Attempt #${retryCount}`);
+	     return attemptSignup();
+	   } else {
+	     throw new Error(`Max retries reached. Unable to sign up after ${maxRetries} attempts.`);
+	   }
+	 } else {
+	   return cy.wrap({ newName, newEmail });
+	   }
+});
+};
   return attemptSignup();
+});
+
+Cypress.Commands.add('login', (loginPage, email, password) => {
+  loginPage.getLoginEmailTextBox().clear().type(email);
+  loginPage.getLoginPasswordTextBox().clear().type(password);
+  loginPage.getLoginSubmitBtn().click();
 });

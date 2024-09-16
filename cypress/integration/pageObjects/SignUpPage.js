@@ -26,7 +26,6 @@ class SignUpPage {
   getSignUpCreateAccountBtn() {
   	 return cy.get("[data-qa='create-account']");
   }
-
 }
 
 export default SignUpPage;

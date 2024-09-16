@@ -9,12 +9,6 @@
     "Test24": "npx cypress run --spec \"cypress/integration/examples/Test24.js\"",
     "Test26": ""
   },
-  "cypress-cucumber-preprocessor": {
-    "json": {
-      "enabled": true,
-      "output": "cypress/cucumberReports/results.json"
-    }
-  },
   "author": "Di Yong",
   "license": "ISC",
   "description": "Cypress automation exercise",

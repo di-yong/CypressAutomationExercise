@@ -8,6 +8,7 @@ import CartPage from '../../pageObjects/CartPage';
 import CheckOutPage from '../../pageObjects/CheckOutPage';
 import PaymentPage from '../../pageObjects/PaymentPage';
 import PaymentCompletePage from '../../pageObjects/PaymentCompletePage';
+import DeleteAccountPage from '../../pageObjects/DeleteAccountPage';
 
 const mainPage = new MainPage();
 const loginPage = new LoginPage();
@@ -17,24 +18,31 @@ const cartPage = new CartPage();
 const checkOutPage = new CheckOutPage();
 const paymentPage = new PaymentPage();
 const paymentCompletePage = new PaymentCompletePage();
+const deleteAccountPage = new DeleteAccountPage();
 
-const fields = [
-	{name: 'name_on_card', value: 'DiTest', message: 'Please fill out this field.'},
-	{name: 'card_number', value: '123456789', message: 'Please fill out this field.'},
-	{name: 'cvc', value: '01', message: 'Please fill out this field.'},
-	{name: 'expiry_month', value: '02', message: 'Please fill out this field.'},
-	{name: 'expiry_year', value: '2042', message: 'Please fill out this field.'}
-];
+//const fields = [
+//	{name: 'name_on_card', value: 'DiTest', message: 'Please fill out this field.'},
+//	{name: 'card_number', value: '123456789', message: 'Please fill out this field.'},
+//	{name: 'cvc', value: '01', message: 'Please fill out this field.'},
+//	{name: 'expiry_month', value: '02', message: 'Please fill out this field.'},
+//	{name: 'expiry_year', value: '2042', message: 'Please fill out this field.'}
+//];
 
 let userData;
+let paymentFields;
 let newName;
 let newEmail;
 
-	before(() => {
-		cy.fixture('example').then((data) => {
-			userData = data.userData;
-		});
+beforeEach(() => {
+	cy.clearCookies();
+	cy.clearLocalStorage();
+	cy.fixture('userData').then((data) => {
+		userData = data.userData;
 	});
+	cy.fixture('paymentFields').then((data) => {
+    paymentFields = data.paymentFields;
+  });
+});
 
 /*------------------Main page------------------*/
 Given('User navigates to the Main page', () => {
@@ -122,7 +130,7 @@ When('User inputs nothing and validates the warning message', () => {
 	paymentPage.getPayAndConfirmOrderBtn().contains('Pay and Confirm Order').click();
 
     // Proceed to Checkout in Incorrect Scenario
-    fields.forEach(field => {
+    paymentFields.forEach(field => {
       cy.get(`input[name='${field.name}']`).then(input => {
         const isValid = input[0].checkValidity();
         const message = isValid ? '' : field.message;
@@ -132,7 +140,7 @@ When('User inputs nothing and validates the warning message', () => {
 })
 
 Then('User inputs correct card information and clicks confirm order button', () => {
-	fields.forEach(field => {
+	paymentFields.forEach(field => {
     cy.get(`input[name='${field.name}']`).type(field.value);
   });
   paymentPage.getPayAndConfirmOrderBtn().contains('Pay and Confirm Order').click();
@@ -154,4 +162,30 @@ Then('User verify the invoice document', () => {
   cy.readFile(filePath).should((fileContent) => {
   expect(fileName.endsWith('.txt')).to.be.true;
 	})
+})
+/*------------------Main page------------------*/
+Then('User Scroll down to the bottom of the page', () => {
+	 cy.scrollTo('bottom', { duration: 4000 });
+   cy.wait(1000);
+})
+
+When('User Scroll up to the top of the page', () => {
+	 cy.scrollTo('top', { duration: 4000 });
+})
+
+Then('User validates the headers becomes visible again', () => {
+	mainPage.getAutomationExerciseImg().should('be.visible');
+})
+
+When('User clicks the Delete Account button', () => {
+	mainPage.getDeleteAccountBtn().click();
+})
+
+/*------------------Delete Account page------------------*/
+Then('User validates the account bas been deleted successful', () => {
+	deleteAccountPage.getAccountDeletedText().should('have.text', 'Account Deleted!');
+})
+
+Then('User clicks the Continue button to main page', () => {
+	deleteAccountPage.getContinueBtn().click();
 })

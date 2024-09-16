@@ -11,6 +11,12 @@ class MainPage {
 	getCartBtn() {
 		return cy.get("[href='/view_cart'] [class='fa fa-shopping-cart']");
 	}
+	getAutomationExerciseImg() {
+		return cy.get("[alt='Website for automation practice']");
+	}
+	getDeleteAccountBtn() {
+    return cy.get("[href='/delete_account']");
+  }
 }
 
 export default MainPage;

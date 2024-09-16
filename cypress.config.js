@@ -6,7 +6,6 @@ async function setupNodeEvents(on, config) {
   await preprocessor.addCucumberPreprocessorPlugin(on, config);
 	require('cypress-mochawesome-reporter/plugin')(on);
   on("file:preprocessor", browserify.preprocessor(config));
-  // Make sure to return the config object as it might have been modified by the plugin.
   return config;
 }
 

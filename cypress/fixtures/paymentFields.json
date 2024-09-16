@@ -1,0 +1,29 @@
+{
+  "paymentFields": [
+    {
+      "name": "name_on_card",
+      "value": "DiTest",
+      "message": "Please fill out this field."
+    },
+    {
+      "name": "card_number",
+      "value": "123456789",
+      "message": "Please fill out this field."
+    },
+    {
+      "name": "cvc",
+      "value": "01",
+      "message": "Please fill out this field."
+    },
+    {
+      "name": "expiry_month",
+      "value": "02",
+      "message": "Please fill out this field."
+    },
+    {
+      "name": "expiry_year",
+      "value": "2042",
+      "message": "Please fill out this field."
+    }
+  ]
+}
