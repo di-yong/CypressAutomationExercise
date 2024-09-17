@@ -107,6 +107,7 @@ The following custom commands have been added to enhance and simplify the test s
 - **`cy.signupWithRandomEmail(userData, loginPage)`**: Signs up using a randomly generated email and logs in the user.
 - **`cy.validateAddress(checkOutPage, deliveryAddressSelector, billingAddressSelector)`**: Validates that the delivery and billing addresses are the same.
 - **`cy.verifyDownloadedFile(fileName)`**: Verifies the downloaded invoice or any other file during tests.
+- etc.
   
 ## Reporting
 
