@@ -79,8 +79,11 @@ Cypress.Commands.add('handlePaymentFields', (paymentFields, action) => {
     if (action === 'validate') {
       cy.get(inputSelector).then(input => {
         const isValid = input[0].checkValidity();
-        const message = isValid ? '' : field.message;
-        expect(input[0].validationMessage).to.eq(message);
+        const message_filledIn = isValid ? '' : field.message_filledIn;
+        const message_filledOut = isValid ? '' : field.message_filledOut;
+        const expectedMessages = [message_filledIn, message_filledOut];
+
+        expect(expectedMessages).to.include(input[0].validationMessage);
       });
     } else if (action === 'fill') {
       cy.get(inputSelector).type(field.value);
